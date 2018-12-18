@@ -44,7 +44,10 @@ function encode(current, previous, factor) {
  *
  * @see https://github.com/Project-OSRM/osrm-frontend/blob/master/WebContent/routing/OSRM.RoutingGeometry.js
  */
-polyline.decode = function(str, precision) {
+polyline.decode = function(str, opts = {}) {
+    let {array, precision} = opts;
+    if(array == undefined) array = true;
+
     var index = 0,
         lat = 0,
         lng = 0,
@@ -87,7 +90,8 @@ polyline.decode = function(str, precision) {
         lat += latitude_change;
         lng += longitude_change;
 
-        coordinates.push([lat / factor, lng / factor]);
+        if(array) coordinates.push([lat / factor, lng / factor]);
+        else coordinates.push({lat: lat / factor, lng: lng / factor});
     }
 
     return coordinates;
@@ -148,7 +152,7 @@ polyline.fromGeoJSON = function(geojson, precision) {
  * @returns {Object}
  */
 polyline.toGeoJSON = function(str, precision) {
-    var coords = polyline.decode(str, precision);
+    var coords = polyline.decode(str, {precision});
     return {
         type: 'LineString',
         coordinates: flipped(coords)
